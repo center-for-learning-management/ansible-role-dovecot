@@ -44,5 +44,9 @@ lda_mailbox_autosubscribe = {{ dovecot_lda_mailbox_autosubscribe }}
 
 protocol lda {
   # Space separated list of plugins to load (default is global mail_plugins).
+{% if dovecot_lda_mail_plugins_extra is defined and dovecot_lda_mail_plugins_extra|length > 0 %}
   mail_plugins = $mail_plugins {{ dovecot_lda_mail_plugins_extra }}
+{% else %}
+  #mail_plugins = $mail_plugins
+{% endif %}
 }

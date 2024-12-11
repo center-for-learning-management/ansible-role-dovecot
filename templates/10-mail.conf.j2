@@ -105,13 +105,25 @@ namespace inbox {
 # System user and group used to access mails. If you use multiple, userdb
 # can override these by returning uid or gid fields. You can use either numbers
 # or names. <doc/wiki/UserIds.txt>
+{% if dovecot_mail_uid is defined and dovecot_mail_uid|length > 0 %}
 mail_uid = {{ dovecot_mail_uid }}
+{% else %}
+#mail_uid =
+{% endif %}
+{% if dovecot_mail_gid is defined and dovecot_mail_gid|length > 0 %}
 mail_gid = {{ dovecot_mail_gid }}
+{% else %}
+#mail_gid =
+{% endif %}
 
 # Group to enable temporarily for privileged operations. Currently this is
 # used only with INBOX when either its initial creation or dotlocking fails.
 # Typically this is set to "mail" to give access to /var/mail.
+{% if dovecot_mail_privileged_group is defined and dovecot_mail_privileged_group|length > 0%}
+mail_privileged_group = {{ dovecot_mail_privileged_group }}
+{% else %}
 #mail_privileged_group =
+{% endif %}
 
 # Grant access to these supplementary groups for mail processes. Typically
 # these are used to set up access to shared mailboxes. Note that it may be
@@ -215,7 +227,11 @@ mail_gid = {{ dovecot_mail_gid }}
 
 # Space separated list of plugins to load for all services. Plugins specific to
 # IMAP, LDA, etc. are added to this list in their own .conf files.
+{% if dovecot_mail_plugins is defined and dovecot_mail_plugins|length > 0 %}
 mail_plugins = {{ dovecot_mail_plugins|join(' ') }}
+{% else %}
+#mail_plugins = 
+{% endif %}
 
 ##
 ## Mailbox handling optimizations

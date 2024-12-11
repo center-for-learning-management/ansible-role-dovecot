@@ -1,8 +1,10 @@
 ---
 - name: Install role dependencies
   apt:
-    pkg: "{{ dovecot_dependencies }}"
+    pkg: "{{ item }}"
     cache_valid_time: 600
+  when: "item not in ansible_facts.packages"
+  loop: "{{ dovecot_dependencies }}"
 
 - name: Ensure mail user is present
   user:
@@ -11,7 +13,7 @@
     shell: /bin/false
     state: present
     uid: "{{ dovecot_mail_uid }}"
-  when: not dovecot_backup_follower
+  when: not dovecot_backup_follower and dovecot_mail_uid is defined and dovecot_mail_uid is defined and dovecot_mail_uid|length > 0
 
 - name: Ensure mail user is present
   user:
@@ -20,7 +22,7 @@
     shell: /bin/bash
     state: present
     uid: "{{ dovecot_mail_uid }}"
-  when: dovecot_backup_follower
+  when: dovecot_backup_follower and dovecot_mail_uid is defined and dovecot_mail_uid is defined and dovecot_mail_uid|length > 0
 
 - name: Ensure mail home is present
   file:

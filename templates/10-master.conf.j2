@@ -1,10 +1,22 @@
+{% if dovecot_default_process_limit is defined and dovecot_default_process_limit|string|length > 0 %}
 default_process_limit = {{ dovecot_default_process_limit }}
+{% else %}
+#default_process_limit = 100
+{% endif %}
+{% if dovecot_default_client_limit is defined and dovecot_default_client_limit|string|length > 0 %}
 default_client_limit = {{ dovecot_default_client_limit }}
+{% else %}
+#default_client_limit = 1000
+{% endif %}
 
 # Default VSZ (virtual memory size) limit for service processes. This is mainly
 # intended to catch and kill processes that leak memory before they eat up
 # everything.
+{% if dovecot_default_vsz_limit is defined and dovecot_default_vsz_limit|string|length > 0 %}
 default_vsz_limit = {{ dovecot_default_vsz_limit }}
+{% else %}
+#default_vsz_limit = 256M
+{% endif %}
 
 # Login user is internally used by login processes. This is the most untrusted
 # user in Dovecot system. It shouldn't have access to anything at all.
@@ -26,10 +38,18 @@ service imap-login {
   # Number of connections to handle before starting a new process. Typically
   # the only useful values are 0 (unlimited) or 1. 1 is more secure, but 0
   # is faster. <doc/wiki/LoginProcess.txt>
+{% if dovecot_login_service_count is defined and dovecot_login_service_count|string|length > 0 %}
   service_count = {{ dovecot_login_service_count }}
+{% else %}
+  #service_count = 1
+{% endif %}
 
   # Number of processes to always keep waiting for more connections.
+{% if dovecot_login_process_min_avail is defined and dovecot_login_process_min_avail|string|length > 0 %}
   process_min_avail = {{ dovecot_login_process_min_avail }}
+{% else %}
+  #process_min_avail = 0
+{% endif %}
 
   # If you set service_count=0, you probably need to grow this.
   #vsz_limit = $default_vsz_limit
@@ -47,10 +67,19 @@ service pop3-login {
   # Number of connections to handle before starting a new process. Typically
   # the only useful values are 0 (unlimited) or 1. 1 is more secure, but 0
   # is faster. <doc/wiki/LoginProcess.txt>
+{% if dovecot_login_service_count is defined and dovecot_login_service_count|string|length > 0 %}
   service_count = {{ dovecot_login_service_count }}
+{% else %}
+  #service_count = 1
+{% endif %}
+
 
   # Number of processes to always keep waiting for more connections.
+{% if dovecot_login_process_min_avail is defined and dovecot_login_process_min_avail|string|length > 0 %}
   process_min_avail = {{ dovecot_login_process_min_avail }}
+{% else %}
+  #process_min_avail = 0
+{% endif %}
 
   # If you set service_count=0, you probably need to grow this.
   #vsz_limit = $default_vsz_limit
@@ -81,7 +110,11 @@ service imap {
   #vsz_limit = $default_vsz_limit
 
   # Max. number of IMAP processes (connections)
+{% if dovecot_process_limit_service_imap is defined and dovecot_process_limit_service_imap|string|length > 0 %}
   process_limit = {{ dovecot_process_limit_service_imap }}
+{% else %}
+  #process_limit = 1024
+{% endif %}
 }
 
 service pop3 {
@@ -109,9 +142,17 @@ service auth {
   # something else than 0666 and Dovecot lets the kernel enforce the
   # permissions (e.g. 0777 allows everyone full permissions).
   unix_listener auth-userdb {
-    mode = 0660
+{% if dovecot_auth_mode is defined and dovecot_auth_mode|string|length > 0 %}
+    mode = {{ dovecot_auth_mode }}
+{% else %}
+    #mode = 0666
+{% endif %}
     #user = 
-    group = vmail
+{% if dovecot_auth_group is defined and dovecot_auth_group|string|length > 0 %}
+    group = {{ dovecot_auth_group }}
+{% else %}
+    #group = 
+{% endif %}
   }
 
 {% if dovecot_postfix_auth %}
@@ -125,15 +166,20 @@ service auth {
 {% endif %}
   # Auth process is run as this user.
   #user = $default_internal_user
+{% if dovecot_userli_user is defined and dovecot_userli_user|string|length > 0 %}
   extra_groups = {{ dovecot_userli_user }}
+{% endif %}
 }
 
 service auth-worker {
   # Auth worker process is run as root by default, so that it can access
   # /etc/shadow. If this isn't necessary, the user should be changed to
   # $default_internal_user.
+{% if dovecot_auth_worker_user is defined and dovecot_auth_worker_user|string|length > 0 %}
+  user = {{ dovecot_auth_worker_user }}
+{% else %}
   #user = root
-  user = $default_internal_user
+{% endif %}
 }
 
 service dict {
