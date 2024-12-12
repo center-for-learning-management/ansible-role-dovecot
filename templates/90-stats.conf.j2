@@ -2,14 +2,30 @@
 
 service stats {
     unix_listener stats-reader {
-        user = vmail
-        group = vmail
+{% if dovecot_stat_user is defined and dovecot_stat_user|string|length > 0 %}
+        user = {{ dovecot_stat_user }}
+{% else %}
+        #user = 
+{% endif %}
+{% if dovecot_stat_group is defined and dovecot_stat_group|string|length > 0 %}
+        group = {{ dovecot_auth_group }}
+{% else %}
+        #group = 
+{% endif %}
         mode = 0660
     }
 
 unix_listener stats-writer {
-        user = vmail
-        group = vmail
+{% if dovecot_stat_user is defined and dovecot_stat_user|string|length > 0 %}
+        user = {{ dovecot_stat_user }}
+{% else %}
+        #user = 
+{% endif %}
+{% if dovecot_stat_group is defined and dovecot_stat_group|string|length > 0 %}
+        group = {{ dovecot_stat_group }}
+{% else %}
+        #group = 
+{% endif %}
         mode = 0660
     }
 }

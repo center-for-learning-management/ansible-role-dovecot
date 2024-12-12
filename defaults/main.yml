@@ -54,6 +54,8 @@ dovecot_userli_user: vagrant
 
 dovecot_vmail_path: /var/vmail
 dovecot_auth_group: vmail
+dovecot_stat_user: vmail
+dovecot_stat_group: vmail
 
 dovecot_openmetrics_enabled: false
 dovecot_openmetrics_port: 9900

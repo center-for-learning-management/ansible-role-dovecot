@@ -1,4 +1,9 @@
 ---
+- name: Gather the package facts
+  package_facts:
+   manager: auto
+  when: ansible_facts.packages|default([])|length <1
+
 - name: Install role dependencies
   apt:
     pkg: "{{ item }}"
@@ -31,11 +36,15 @@
     owner: vmail
     group: vmail
     mode: "u+rw,g+rw,o-rwx"
+  when: dovecot_backup_follower and dovecot_mail_uid is defined and dovecot_mail_uid is defined and dovecot_mail_uid|length > 0
 
 - name: Ensure dovecot is installed
   apt:
-    pkg: "{{ dovecot_apt_packages }}"
+    pkg: "{{ item }}"
+    cache_valid_time: 600
     state: present
+  when: "item not in ansible_facts.packages"
+  loop: "{{ dovecot_apt_packages }}"
 
 - name: Import systemd limits tasks
   import_tasks: systemd-limits.yml
